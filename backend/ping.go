@@ -3,12 +3,12 @@ package backend
 import (
 	"encoding/binary"
 	"fmt"
-	"net"
 	"github.com/99MyCql/dou-pingGUI/backend/ICMP"
+	"net"
 )
 
 // 获取主机 IP 地址，可能有多个
-func GetIPAddrs() []net.Addr {
+func (contro *Controller) GetIPAddrs() []net.Addr {
 	ip_addrs := make([]net.Addr, 0)
 
 	net_interfaces, err := net.Interfaces()
@@ -32,32 +32,29 @@ func GetIPAddrs() []net.Addr {
 }
 
 // ping 主机，ping 通一次则返回 true
-func Ping(host string, data []byte, count uint) (suc_once bool) {
+func (contro *Controller) Ping(host string, data []byte, count uint) bool {
 	// 如果是主机名，则先解析主机名
 	IP, err := net.LookupHost(host)
 	if err != nil {
 		fmt.Println("[ping error] host name error!")
-		suc_once = false
+		return false
 	}
 
 	fmt.Printf("ping %s with %d bytes \"%s\":\n", IP[0], len(data), string(data))
 	for i := uint(0); i < count; i++ {
-		// 发送 ping 程序的 ICMP 报文
-		suc, ttl, duration, date_len := ICMP.SendICMP(IP[0], 8, 0, data, 1)
-		if suc == false {
-			fmt.Println("[ping error] request timeout!")
-			suc_once = false
-		} else {
-			fmt.Printf("[ping success] receive: bytes=%d, time=%dms, TLL=%d\n", date_len, duration, ttl)
-			suc_once = true
-		}
+		go func() {
+			// 发送 ping 程序的 ICMP 报文
+			suc, ttl, duration, data_len := ICMP.SendICMP(IP[0], 8, 0, data, 1)
+			contro.logger.Infof("suc:%d, ttl:%d, duration:%d, data len:%d", suc, ttl, duration, data_len)
+			contro.runtime.Events.Emit("ping", suc, ttl, duration, data_len)
+		}()
 	}
 
-	return suc_once
+	return true
 }
 
 // ping 一个子网中的所有主机，返回可以 ping 通的 IP 地址
-func PingIPNet(ip_net *net.IPNet) (ip_list []string) {
+func (contro *Controller) PingIPNet(ip_net *net.IPNet) (ip_list []string) {
 	ip := binary.BigEndian.Uint32(ip_net.IP)
 	mask := binary.BigEndian.Uint32(ip_net.Mask)
 
@@ -67,7 +64,7 @@ func PingIPNet(ip_net *net.IPNet) (ip_list []string) {
 			byte((ip+i)>>16),
 			byte((ip+i)>>8),
 			byte(ip+i))
-		if Ping(ip_string, []byte{}, 1) {
+		if contro.Ping(ip_string, []byte{}, 1) {
 			ip_list = append(ip_list, ip_string)
 		}
 	}

@@ -1,21 +1,22 @@
 package main
 
 import (
-    "fmt"
-    "github.com/leaanthony/mewn"
-    "github.com/wailsapp/wails"
-    "github.com/99MyCql/dou-pingGUI/backend"
-    "net"
+	"fmt"
+	"net"
+
+	"github.com/99MyCql/dou-pingGUI/backend"
+	"github.com/leaanthony/mewn"
+	"github.com/wailsapp/wails"
 )
 
 func basic() string {
-  return "Hello World!"
+	return "Hello World!"
 }
 
-func testBackend() {
-    backend.Ping("192.168.0.100", []byte("hello world!"), 4)
+func testBackend(controller backend.Controller) {
+	controller.Ping("192.168.0.100", []byte("hello world!"), 4)
 
-	ip_addrs := backend.GetIPAddrs()
+	ip_addrs := controller.GetIPAddrs()
 	fmt.Println(ip_addrs)
 
 	for _, ip_addr := range ip_addrs {
@@ -23,23 +24,23 @@ func testBackend() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(backend.PingIPNet(ip_net))
+		fmt.Println(controller.PingIPNet(ip_net))
 	}
 }
 
 func main() {
 
-    js := mewn.String("./frontend/dist/app.js")
-    css := mewn.String("./frontend/dist/app.css")
+	js := mewn.String("./frontend/dist/app.js")
+	css := mewn.String("./frontend/dist/app.css")
 
-    app := wails.CreateApp(&wails.AppConfig{
-        Width:  1024,
-        Height: 768,
-        Title:  "dou-pingGUI",
-        JS:     js,
-        CSS:    css,
-        Colour: "#131313",
-    })
-    app.Bind(basic)
-    app.Run()
+	app := wails.CreateApp(&wails.AppConfig{
+		Width:  1024,
+		Height: 600,
+		Title:  "dou-pingGUI",
+		JS:     js,
+		CSS:    css,
+		Colour: "#131313",
+	})
+	app.Bind(backend.NewController())
+	app.Run()
 }

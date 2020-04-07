@@ -6,6 +6,11 @@ import App from './App.vue';
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
 
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
+
+Vue.use(ElementUI);
+
 import * as Wails from '@wailsapp/runtime';
 
 Wails.Init(() => {
