@@ -33,12 +33,12 @@
           </el-input-number>
         </el-form-item>
         <el-form-item style="margin-bottom:0">
-          <el-button size="small" type="primary">ping</el-button>
-          <el-button size="small" type="info">stop</el-button>
+          <el-button size="small" type="primary" @click="ping">ping</el-button>
+          <el-button size="small" type="danger" @click="stop">stop</el-button>
         </el-form-item>
       </el-form>
 
-      <el-progress type="circle" :percentage="progress"></el-progress>
+      <el-progress type="circle" :percentage="getProgress()"></el-progress>
     </div>
 
     <el-divider>结果</el-divider>
@@ -46,9 +46,9 @@
     <div id="body">
       <el-table
         :data="tableData"
-        style="width: 100%"
-        fit
-        :row-class-name="tableRowClassName">
+        :row-class-name="tableRowClassName"
+        style="width:100%"
+        :fit="true">
         <el-table-column
           type="index"
           label="#"
@@ -56,19 +56,28 @@
           width="100">
         </el-table-column>
         <el-table-column
-          prop="date_len"
+          prop="ip"
+          label="目标 IP"
+          align="center"
+          min-width="191">
+        </el-table-column>
+        <el-table-column
+          prop="data_len"
           label="返回字节 / Byte"
-          align="center">
+          align="center"
+          min-width="191">
         </el-table-column>
         <el-table-column
           prop="time"
           label="时间 / ms"
-          align="center">
+          align="center"
+          min-width="191">
         </el-table-column>
         <el-table-column
           prop="ttl"
           label="TTL"
-          align="center">
+          align="center"
+          min-width="191">
         </el-table-column>
       </el-table>
     </div>
@@ -76,39 +85,27 @@
 </template>
 
 <script>
+import Wails from '@wailsapp/runtime';
+
 export default {
   data() {
     return {
       form: {
         ip: '',
-        count: 5,
+        count: 4,
         data: 'hello world!'
       },
-      progress: 25,
-      tableData: [{
-        suc: true,
-        date_len: 23,
-        time: 12,
-        ttl: 32,
-      }, {
-        suc: true,
-        date_len: 23,
-        time: 12,
-        ttl: 32,
-      }, {
-        suc: true,
-        date_len: 23,
-        time: 12,
-        ttl: 32,
-      }, {
-        suc: true,
-        date_len: 23,
-        time: 12,
-        ttl: 32,
-      }]
+      tableData: []
     }
   },
   methods: {
+    getProgress() {
+      if (this.tableData.length > 0) {
+        return (this.tableData.length / this.form.count).toFixed(2) * 100;
+      } else {
+        return 0;
+      }
+    },
     tableRowClassName({rowIndex}) {
       if (this.tableData[rowIndex].suc) {
         return 'success-row';
@@ -117,10 +114,38 @@ export default {
       }
     },
     countHandle(currentValue) {
+      this.tableData = [];
       if (currentValue > 10) this.form.count = 10;
       else if (currentValue < 0) this.form.count = 0;
+    },
+    ping() {
+      this.tableData = []
+      window.backend.Controller.Ping(this.form.ip, this.form.data, this.form.count)
+      .then(suc => {
+        if (!suc) {
+          this.$message.error('host name error!');
+        }
+      })
+    },
+    stop() {
+      window.backend.Controller.SetStop();
     }
   },
+  mounted() {
+    Wails.Events.On("ping", (suc, ip, ttl, duration, data_len) => {
+      window.console.log(suc, ip, ttl, duration, data_len)
+      if (!suc) {
+        duration = "timeout"
+      }
+      this.tableData.push({
+        suc: suc,
+        ip: ip,
+        data_len: data_len,
+        time: duration,
+        ttl: ttl,
+      })
+    });
+  }
 }
 </script>
 
@@ -150,4 +175,7 @@ export default {
   color: #67c23a;
 }
 
+.el-table .my-cell {
+  width: 30%;
+}
 </style>

@@ -3,8 +3,10 @@ package backend
 import (
 	"encoding/binary"
 	"fmt"
-	"github.com/99MyCql/dou-pingGUI/backend/ICMP"
 	"net"
+	"sync/atomic"
+
+	"github.com/99MyCql/dou-pingGUI/backend/ICMP"
 )
 
 // 获取主机 IP 地址，可能有多个
@@ -36,19 +38,24 @@ func (contro *Controller) Ping(host string, data []byte, count uint) bool {
 	// 如果是主机名，则先解析主机名
 	IP, err := net.LookupHost(host)
 	if err != nil {
-		fmt.Println("[ping error] host name error!")
+		contro.logger.Info("ping err: host name error!")
 		return false
 	}
 
-	fmt.Printf("ping %s with %d bytes \"%s\":\n", IP[0], len(data), string(data))
-	for i := uint(0); i < count; i++ {
-		go func() {
+	contro.logger.Infof("ping %s with %d bytes \"%s\":\n", IP[0], len(data), string(data))
+
+	go func() {
+		for i := uint(0); i < count; i++ {
+			if contro.stop == 1 {
+				atomic.StoreInt32(&contro.stop, 0)
+				break
+			}
 			// 发送 ping 程序的 ICMP 报文
 			suc, ttl, duration, data_len := ICMP.SendICMP(IP[0], 8, 0, data, 1)
-			contro.logger.Infof("suc:%d, ttl:%d, duration:%d, data len:%d", suc, ttl, duration, data_len)
-			contro.runtime.Events.Emit("ping", suc, ttl, duration, data_len)
-		}()
-	}
+			contro.logger.Infof("ping result: %t, ttl:%d, duration:%d, data len:%d", suc, ttl, duration, data_len)
+			contro.runtime.Events.Emit("ping", suc, IP[0], ttl, duration, data_len)
+		}
+	}()
 
 	return true
 }
