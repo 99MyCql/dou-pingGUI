@@ -41,13 +41,17 @@ cd frontend/
 npm run serve
 ```
 
-### Build
+### Serve
 
 ```bash
 wails build -p
 ```
 
-then you can get `dou-pingGUI.exe` in `dou-pingGUI/`.
+if on windows, you can get `dou-pingGUI.exe` in `dou-pingGUI/`. Then, double click the `dou-pingGUI.exe`:
+
+![pic](imgs/1.png)
+
+![pic](imgs/2.png)
 
 ## standard
 
