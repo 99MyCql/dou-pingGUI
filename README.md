@@ -2,11 +2,52 @@
 
 ## Introduction
 
-go 语言实现的 ping 桌面应用程序。
+go 语言实现的 ping 桌面应用程序。基于 Wails 框架，前端基于 Vue.js 。
 
-## Content
+## Features
+
+- Ping any host
+- Ping all hosts in any subnet
 
 ## Usage
+
+### Environment
+
+My basic environment are:
+
+- Go 1.14
+- npm 6.4.1
+- Wails 1.0.2
+- Vue 2.5.22
+
+### Run
+
+Enter root directory of project:
+
+```bash
+cd dou-pingGUI/
+```
+
+Run backend:
+
+```bash
+wails serve
+```
+
+Run frontend:
+
+```bash
+cd frontend/
+npm run serve
+```
+
+### Build
+
+```bash
+wails build -p
+```
+
+then you can get `dou-pingGUI.exe` in `dou-pingGUI/`.
 
 ## standard
 

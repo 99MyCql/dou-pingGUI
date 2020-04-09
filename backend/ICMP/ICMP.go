@@ -58,11 +58,15 @@ import (
 // computing the checksum
 func checkSum(data []byte) uint16 {
     var length int = len(data)
+
+    // If the total length is odd, the received data is padded with one
+    //    octet of zeros for computing the checksum.
     if length % 2 == 1 {
         data = append(data, 0)
         length++
     }
 
+    // 16个比特相加
     var sum uint32
     for i:=0; i < length; i+=2 {
         sum += uint32(data[i]) << 8 + uint32(data[i+1])
@@ -74,7 +78,8 @@ func checkSum(data []byte) uint16 {
 }
 
 // send ICMP messgae
-func SendICMP(IP string, typ uint8, code uint8, icmp_data []byte, timeout uint) (suc bool, ttl uint8, duration int64, data_len uint) {
+func SendICMP(host string, typ uint8, code uint8, icmp_data []byte, timeout uint) (
+    suc bool, ip string, ttl uint8, duration int64, data_len uint) {
     defer (func() {
         if err := recover(); err != nil {
             suc = false
@@ -91,10 +96,13 @@ func SendICMP(IP string, typ uint8, code uint8, icmp_data []byte, timeout uint) 
     icmp := append(icmp_header.toBytes(), icmp_data...)
 
     // 连接对应IP地址。但，ICMP并不需要建立连接。所以，此处并未建立连接，而只是走个流程
-    conn, err := net.Dial("ip4:icmp", IP)
+    conn, err := net.Dial("ip4:icmp", host)
     if err != nil {
         g_logger.Panic(err)
     }
+
+    // 记录目的 IP 地址，防止 panic 被触发，导致 ip 未赋值
+    ip = conn.RemoteAddr().String()
 
     defer conn.Close()
 
@@ -123,5 +131,5 @@ func SendICMP(IP string, typ uint8, code uint8, icmp_data []byte, timeout uint) 
     length := uint(binary.BigEndian.Uint16(recv_buf[2:4]))
 
     // 前20个字节为IP报文首部，第8个字节为TTL，第20~28个字节为ICMP首部
-    return true, recv_buf[8], duration, length-20-8
+    return true, conn.RemoteAddr().String(), recv_buf[8], duration, length-20-8
 }

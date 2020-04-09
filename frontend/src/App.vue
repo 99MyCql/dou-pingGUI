@@ -1,16 +1,45 @@
 <template>
   <div id="app">
+    <el-menu
+      id="header"
+      default-active="1"
+      mode="horizontal"
+      @select="handleSelect"
+      background-color="#545c64"
+      text-color="#fff"
+      active-text-color="#ffd04b">
+      <el-menu-item id="brand" disabled>dou-ping</el-menu-item>
+      <el-menu-item index="1" class="menu-item">PING 主机</el-menu-item>
+      <el-menu-item index="2" class="menu-item">PING 网络</el-menu-item>
+    </el-menu>
+
+    <ip-ping v-if="curMenuItem == 1"></ip-ping>
+
+    <ipnet-ping v-else></ipnet-ping>
   </div>
 </template>
 
 <script>
 import "./assets/css/main.css";
 import ipPing from "./components/ip-ping"
+import ipnetPing from "./components/ipnet-ping"
 
 export default {
   name: "app",
   components: {
-    ipPing
+    ipPing,
+    ipnetPing
+  },
+  data() {
+    return {
+      curMenuItem: 1
+    }
+  },
+  methods: {
+    handleSelect(index) {
+      window.console.log(index, typeof index)
+      this.curMenuItem = index
+    }
   }
 };
 </script>
