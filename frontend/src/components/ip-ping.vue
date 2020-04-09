@@ -4,8 +4,7 @@
       <el-form :inline="true" :model="form">
         <el-form-item label="主机" style="margin-bottom:0">
           <el-input
-            style="width: 130px;"
-            class="form-item"
+            style="width: 130px;margin-right: 10px;"
             size="small"
             v-model="form.ip"
             placeholder="IP or Host name">
@@ -13,8 +12,7 @@
         </el-form-item>
         <el-form-item label="数据" style="margin-bottom:0">
           <el-input
-            style="width: 150px;"
-            class="form-item"
+            style="width: 150px;margin-right: 10px;"
             size="small"
             v-model="form.data"
             maxlength="16"
@@ -47,6 +45,7 @@
       <el-table
         :data="tableData"
         :row-class-name="tableRowClassName"
+        height="360"
         style="width:100%"
         :fit="true">
         <el-table-column
@@ -120,10 +119,10 @@ export default {
     },
     ping() {
       this.tableData = []
-      window.backend.Controller.Ping(this.form.ip, this.form.data, this.form.count)
+      window.backend.Controller.Ping(this.form.ip.trim(), this.form.data, this.form.count)
       .then(suc => {
         if (!suc) {
-          this.$message.error('host name error!');
+          this.$message.error('主机名错误！');
         }
       })
     },
@@ -161,10 +160,6 @@ export default {
   align-items: center;
 }
 
-.form-item {
-  margin-right: 10px;
-}
-
 .el-table .warning-row {
   background-color: #fef0f0;
   color: #f56c6c;
@@ -173,9 +168,5 @@ export default {
 .el-table .success-row {
   background-color: #f0f9eb;
   color: #67c23a;
-}
-
-.el-table .my-cell {
-  width: 30%;
 }
 </style>

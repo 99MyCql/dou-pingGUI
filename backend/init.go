@@ -6,10 +6,11 @@ import (
 	"github.com/wailsapp/wails"
 )
 
+// 后端控制器
 type Controller struct {
-	runtime *wails.Runtime
-	logger  *wails.CustomLogger
-	stop    int32
+	runtime *wails.Runtime      // Wails Runtime Interface. 可以借此向前端发送信息
+	logger  *wails.CustomLogger // Wails 输出流接口
+	stop    int32               // 是否暂停所有 goroutine ，1为暂停，0则不暂停
 }
 
 // constructor of Controller

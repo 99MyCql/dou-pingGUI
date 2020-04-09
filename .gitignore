@@ -1,4 +1,6 @@
-*.exe
+*.exe*
+*.syso
+*.rc
 .idea/
 .vscode/
 
