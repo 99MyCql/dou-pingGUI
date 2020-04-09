@@ -2,7 +2,7 @@
 
 ## Introduction
 
-go 语言实现的 ping 桌面应用程序。基于 Wails 框架，前端基于 Vue.js 。
+go 语言实现的 ping 桌面应用程序。基于 [Wails](https://github.com/wailsapp/wails) 框架，前端基于 Vue.js 。
 
 ## Features
 
@@ -20,9 +20,9 @@ My basic environment are:
 - Wails 1.0.2
 - Vue 2.5.22
 
-### Run
+### Debug
 
-Enter root directory of project:
+Enter the project directory:
 
 ```bash
 cd dou-pingGUI/
@@ -41,13 +41,18 @@ cd frontend/
 npm run serve
 ```
 
-### Serve
+Then, you can debug the application in web browser.
+
+### Build
 
 ```bash
+cd dou-pingGUI/
 wails build -p
 ```
 
-if on windows, you can get `dou-pingGUI.exe` in `dou-pingGUI/`. Then, double click the `dou-pingGUI.exe`:
+This will package up the application into a platform-native format.
+
+If on windows, you can get `dou-pingGUI.exe` in the project directory. Then, double click the `dou-pingGUI.exe`:
 
 ![pic](imgs/1.png)
 
