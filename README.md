@@ -11,6 +11,16 @@ go 语言实现的 ping 桌面应用程序。基于 [Wails](https://github.com/w
 
 ## Usage
 
+Download the executable file in [release](https://github.com/99MyCql/dou-pingGUI/releases).
+
+If on windows x86-64, you should download `dou-pingGUI-win64.exe`. Then, double click it:
+
+![pic](imgs/1.png)
+
+![pic](imgs/2.png)
+
+## Development
+
 ### Environment
 
 My basic environment are:
@@ -52,13 +62,9 @@ wails build -p
 
 This will package up the application into a platform-native format.
 
-If on windows, you can get `dou-pingGUI.exe` in the project directory. Then, double click the `dou-pingGUI.exe`:
+If on windows, you can get `dou-pingGUI.exe` in the project directory.
 
-![pic](imgs/1.png)
-
-![pic](imgs/2.png)
-
-## standard
+## Standard
 
 ### Git Commit Format
 
