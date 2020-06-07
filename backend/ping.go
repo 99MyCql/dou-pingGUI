@@ -101,5 +101,5 @@ func (contro *Controller) PingIPNet(ip_CIDR string) int {
 		}
 	}()
 
-	return int(^mask)-2
+	return int(^mask) - 2
 }
